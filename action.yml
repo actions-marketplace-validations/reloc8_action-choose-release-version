@@ -1,0 +1,32 @@
+name: 'action-choose-release-version'
+description: 'Choose the new release version based on the latest version'
+author: 'alessiovierti'
+branding:
+  icon: package
+  color: purple
+
+inputs:
+  source-branch:
+    description: 'Pull request source-branch name'
+    required: true
+  latest-version:
+    description: 'Latest release version'
+    required: true
+
+outputs:
+  new-version:
+    description: 'New release version'
+    value: ${{ steps.choose-new-release-version.outputs.new-version }}
+
+runs:
+  using: 'composite'
+  steps:
+    - id: choose-new-release-version
+      run: |
+        export SOURCE_BRANCH=${{ inputs.source-branch }}
+        export LATEST_VERSION=${{ inputs.latest-version }}
+        export ACTION_PATH=${{ github.action_path }}
+        export NEW_VERSION=`python $ACTION_PATH/main.py`
+        echo "::set-output name=new-version::$(echo $NEW_VERSION)"
+        echo The new release version is \"$NEW_VERSION\"
+      shell: bash
